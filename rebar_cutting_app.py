@@ -318,7 +318,7 @@ def generate_bbs_pdf(df_result, unit):
 
     pdf.ln(5)
     pdf.set_font("Arial", 'B', 12)
-    pdf.cell(250, 10, txt=f"Grand Total Weight: {round(total_weight, 2)} kg", ln=True, align='R')
+    pdf.cell(250, 10, txt=f"Grand Total Weight: {round(total_weight / 1000, 3)} Ton ({round(total_weight, 2)} kg)", ln=True, align='R')
 
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
         pdf.output(tmp.name)
@@ -370,11 +370,11 @@ if lang == "မြန်မာ":
         "bbs_title": "Bar Bending Schedule (BBS)",
         "bbs_desc": "သံချောင်းပုံစံအမျိုးမျိုးအတွက် ဖြတ်တောက်ရမည့်အရှည်နှင့် အလေးချိန်တို့ကို အလိုအလျောက် တွက်ချက်ပေးပါသည်။",
         "bbs_input_header": "၁။ Data ထည့်သွင်းရန်",
-        "bbs_unit": "ယူနစ် (Unit) ရွေးချယ်ရန်",
         "bbs_help": """**💡 Shape (ပုံစံ) အလိုက် အနားများ ထည့်သွင်းနည်း -**
+    * **အတိုင်းအတာအားလုံး mm ဖြင့် ထည့်ပါ။**
     * **(အရေးကြီး) - A, B, C, D, E အားလုံးကို အပြင်အစွန်းမှ အပြင်အစွန်းသို့ (Outer-to-Outer dimension) ဖြင့် ထည့်သွင်းပေးပါ။**
     * ပုံကြမ်းပေါ်ရှိ အနီရောင်စာသား (A, B, C...) လေးများအတိုင်း ဇယားထဲတွင် ယှဉ်တွဲထည့်သွင်းပေးပါ။
-    * **Standard Hook:** လိုအပ်ပါက Hook သို့မဟုတ် Lap Length စုစုပေါင်းကို **{unit}** ယူနစ်ဖြင့် တိုက်ရိုက် ဂဏန်းရိုက်ထည့်ပါ။ (ဒသမနောက် ၄ လုံးအထိ ရိုက်ထည့်နိုင်ပါသည်)""",
+    * **Standard Hook:** လိုအပ်ပါက Hook သို့မဟုတ် Lap Length စုစုပေါင်းကို **mm** ဖြင့် တိုက်ရိုက် ဂဏန်းရိုက်ထည့်ပါ။ (ဒသမနောက် ၄ လုံးအထိ ရိုက်ထည့်နိုင်ပါသည်)""",
         "bbs_shape_help": "သံချောင်းပုံစံရွေးချယ်ရန်",
         "bbs_sketch": "ပုံကြမ်း (Sketch)",
         "bbs_hook_help": "Hook သို့မဟုတ် Lap Length စုစုပေါင်းအရှည်ကို ရိုက်ထည့်ပါ",
@@ -383,7 +383,11 @@ if lang == "မြန်မာ":
         "bbs_res_header": "၂။ BBS ရလဒ်များ",
         "bbs_total_1": "⚖️ စုစုပေါင်း အလေးချိန် (Total Weight) = ",
         "bbs_dl_header": "📄 BBS Report ဆွဲယူရန်",
-        "bbs_warn": "တွက်ချက်ရန်အတွက် Bar Size နှင့် အတိုင်းအတာ (A, B သို့မဟုတ် C) များကို ထည့်သွင်းပေးပါ။"
+        "bbs_warn": "တွက်ချက်ရန်အတွက် Bar Size နှင့် အတိုင်းအတာ (A, B သို့မဟုတ် C) များကို ထည့်သွင်းပေးပါ။",
+        "bbs_add_row": "➕ အမျိုးအစား ထည့်ရန်",
+        "bbs_del_pick": "ဖျက်မည့်အတန်း ရွေးပါ",
+        "bbs_del_row": "🗑️ ဖျက်ရန်",
+        "bbs_del_hint": "အမျိုးအစား အသစ်ထည့်ချင်ရင် ထည့်ရန် နှိပ်ပါ။ ဖျက်ချင်ရင် အတန်းကို ရွေးပြီး ဖျက်ရန် နှိပ်ပါ။"
     }
 else:
     t = {
@@ -418,11 +422,11 @@ else:
         "bbs_title": "Bar Bending Schedule (BBS)",
         "bbs_desc": "Automatically calculate cutting lengths and weights for various rebar shapes.",
         "bbs_input_header": "1. Input Data",
-        "bbs_unit": "Select Unit",
         "bbs_help": """**💡 How to enter dimensions by shape -**
+    * **Enter all dimensions in mm.**
     * **(Important) - Enter all of A, B, C, D, E as Outer-to-Outer dimensions.**
     * Enter the values in the table following the red letters (A, B, C...) on the sketch.
-    * **Standard Hook:** If needed, enter the total hook or lap length directly in **{unit}** (up to 4 decimal places).""",
+    * **Standard Hook:** If needed, enter the total hook or lap length directly in **mm** (up to 4 decimal places).""",
         "bbs_shape_help": "Select rebar shape",
         "bbs_sketch": "Sketch",
         "bbs_hook_help": "Enter the total hook or lap length",
@@ -431,7 +435,11 @@ else:
         "bbs_res_header": "2. BBS Results",
         "bbs_total_1": "⚖️ Total Weight = ",
         "bbs_dl_header": "📄 Download BBS Report",
-        "bbs_warn": "Please enter the Bar Size and dimensions (A, B or C) to calculate."
+        "bbs_warn": "Please enter the Bar Size and dimensions (A, B or C) to calculate.",
+        "bbs_add_row": "➕ Add Row",
+        "bbs_del_pick": "Select row to delete",
+        "bbs_del_row": "🗑️ Delete Row",
+        "bbs_del_hint": "Tap Add to insert a new type. To delete, pick the row and tap Delete."
     }
 
 module = st.sidebar.radio(t["menu"], [t["module_opt"], t["module_bbs"]])
@@ -580,11 +588,12 @@ elif module == t["module_bbs"]:
 
     st.header(t["bbs_input_header"])
 
-    unit_bbs = st.selectbox(t["bbs_unit"], ["m", "ft", "mm", "in"], key="unit_bbs")
+    # All BBS dimensions are in mm
+    unit_bbs = "mm"
 
-    st.markdown(t["bbs_help"].format(unit=unit_bbs))
+    st.markdown(t["bbs_help"])
 
-    if 'bbs_unit_prev' not in st.session_state or st.session_state['bbs_unit_prev'] != unit_bbs or 'bbs_df' not in st.session_state:
+    if 'bbs_df' not in st.session_state:
         st.session_state['bbs_df'] = pd.DataFrame({
             "Bar Mark": ["B1", "L1", "U1", "S1", "C1", "DC1", "BU1"],
             "Shape": ["Straight", "L-Shape", "U-Shape", "Stirrup (Rect)", "Crank Bar", "Double Crank", "Bent Up/Down"],
@@ -599,7 +608,6 @@ elif module == t["module_bbs"]:
             "No. of Members": [0]*7,
             "Bars per Member": [0]*7
         })
-        st.session_state['bbs_unit_prev'] = unit_bbs
 
     edited_bbs = st.data_editor(
         st.session_state['bbs_df'],
@@ -637,6 +645,42 @@ elif module == t["module_bbs"]:
         st.session_state['bbs_df'] = edited_bbs
         st.rerun()
 
+    # Keep the latest table edits, so Add/Delete keeps them
+    st.session_state['bbs_df'] = edited_bbs
+
+    # Add / Delete rows
+    add_col, del_col = st.columns([1, 2])
+    with add_col:
+        if st.button(t["bbs_add_row"], type="secondary"):
+            new_row = {
+                "Bar Mark": "",
+                "Shape": "Straight",
+                "Sketch": SHAPE_IMAGES["Straight"],
+                "Bar Size (mm)": 0,
+                f"A ({unit_bbs})": 0.0,
+                f"B ({unit_bbs})": 0.0,
+                f"C ({unit_bbs})": 0.0,
+                f"D ({unit_bbs})": 0.0,
+                f"E ({unit_bbs})": 0.0,
+                f"Standard Hook ({unit_bbs})": 0.0,
+                "No. of Members": 0,
+                "Bars per Member": 0
+            }
+            st.session_state['bbs_df'] = pd.concat(
+                [st.session_state['bbs_df'], pd.DataFrame([new_row])], ignore_index=True)
+            st.rerun()
+    with del_col:
+        df_now = st.session_state['bbs_df']
+        del_options = [f"{i + 1}. {row['Bar Mark'] or '—'} ({row['Shape']})" for i, row in df_now.iterrows()]
+        del_idx = st.selectbox(
+            t["bbs_del_pick"], options=list(range(len(del_options))),
+            format_func=lambda i: del_options[i])
+        if st.button(t["bbs_del_row"], type="secondary"):
+            st.session_state['bbs_df'] = df_now.drop(
+                index=del_idx).reset_index(drop=True)
+            st.rerun()
+    st.caption(t["bbs_del_hint"])
+
     bbs_calc_btn = st.button(t["bbs_calc_btn"], type="primary")
 
     if bbs_calc_btn:
@@ -666,7 +710,7 @@ elif module == t["module_bbs"]:
 
             total_kg = res_df["Total Wt (kg)"].sum()
             total_ton = round(total_kg / 1000, 3)
-            st.success(f"{t['bbs_total_1']}**{round(total_kg, 2)} kg** ({total_ton} Ton)")
+            st.success(f"{t['bbs_total_1']}**{total_ton} Ton** ({round(total_kg, 2)} kg)")
 
             st.divider()
             st.subheader(t["bbs_dl_header"])
