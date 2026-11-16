@@ -368,7 +368,22 @@ if lang == "မြန်မာ":
         "module_opt": "✂️ ဖြတ်တောက်မှု တွက်ချက်ရန်",
         "module_bbs": "📝 Bar Bending Schedule (BBS)",
         "bbs_title": "Bar Bending Schedule (BBS)",
-        "bbs_desc": "သံချောင်းပုံစံအမျိုးမျိုးအတွက် ဖြတ်တောက်ရမည့်အရှည်နှင့် အလေးချိန်တို့ကို အလိုအလျောက် တွက်ချက်ပေးပါသည်။"
+        "bbs_desc": "သံချောင်းပုံစံအမျိုးမျိုးအတွက် ဖြတ်တောက်ရမည့်အရှည်နှင့် အလေးချိန်တို့ကို အလိုအလျောက် တွက်ချက်ပေးပါသည်။",
+        "bbs_input_header": "၁။ Data ထည့်သွင်းရန်",
+        "bbs_unit": "ယူနစ် (Unit) ရွေးချယ်ရန်",
+        "bbs_help": """**💡 Shape (ပုံစံ) အလိုက် အနားများ ထည့်သွင်းနည်း -**
+    * **(အရေးကြီး) - A, B, C, D, E အားလုံးကို အပြင်အစွန်းမှ အပြင်အစွန်းသို့ (Outer-to-Outer dimension) ဖြင့် ထည့်သွင်းပေးပါ။**
+    * ပုံကြမ်းပေါ်ရှိ အနီရောင်စာသား (A, B, C...) လေးများအတိုင်း ဇယားထဲတွင် ယှဉ်တွဲထည့်သွင်းပေးပါ။
+    * **Standard Hook:** လိုအပ်ပါက Hook သို့မဟုတ် Lap Length စုစုပေါင်းကို **{unit}** ယူနစ်ဖြင့် တိုက်ရိုက် ဂဏန်းရိုက်ထည့်ပါ။ (ဒသမနောက် ၄ လုံးအထိ ရိုက်ထည့်နိုင်ပါသည်)""",
+        "bbs_shape_help": "သံချောင်းပုံစံရွေးချယ်ရန်",
+        "bbs_sketch": "ပုံကြမ်း (Sketch)",
+        "bbs_hook_help": "Hook သို့မဟုတ် Lap Length စုစုပေါင်းအရှည်ကို ရိုက်ထည့်ပါ",
+        "bbs_calc_btn": "📊 BBS တွက်ချက်မည် (Calculate)",
+        "bbs_spin": "တွက်ချက်နေပါသည်...",
+        "bbs_res_header": "၂။ BBS ရလဒ်များ",
+        "bbs_total_1": "⚖️ စုစုပေါင်း အလေးချိန် (Total Weight) = ",
+        "bbs_dl_header": "📄 BBS Report ဆွဲယူရန်",
+        "bbs_warn": "တွက်ချက်ရန်အတွက် Bar Size နှင့် အတိုင်းအတာ (A, B သို့မဟုတ် C) များကို ထည့်သွင်းပေးပါ။"
     }
 else:
     t = {
@@ -401,7 +416,22 @@ else:
         "module_opt": "✂️ Cutting Optimizer",
         "module_bbs": "📝 Bar Bending Schedule (BBS)",
         "bbs_title": "Bar Bending Schedule (BBS)",
-        "bbs_desc": "Automatically calculate cutting lengths and weights for various rebar shapes."
+        "bbs_desc": "Automatically calculate cutting lengths and weights for various rebar shapes.",
+        "bbs_input_header": "1. Input Data",
+        "bbs_unit": "Select Unit",
+        "bbs_help": """**💡 How to enter dimensions by shape -**
+    * **(Important) - Enter all of A, B, C, D, E as Outer-to-Outer dimensions.**
+    * Enter the values in the table following the red letters (A, B, C...) on the sketch.
+    * **Standard Hook:** If needed, enter the total hook or lap length directly in **{unit}** (up to 4 decimal places).""",
+        "bbs_shape_help": "Select rebar shape",
+        "bbs_sketch": "Sketch",
+        "bbs_hook_help": "Enter the total hook or lap length",
+        "bbs_calc_btn": "📊 Calculate BBS",
+        "bbs_spin": "Calculating...",
+        "bbs_res_header": "2. BBS Results",
+        "bbs_total_1": "⚖️ Total Weight = ",
+        "bbs_dl_header": "📄 Download BBS Report",
+        "bbs_warn": "Please enter the Bar Size and dimensions (A, B or C) to calculate."
     }
 
 module = st.sidebar.radio(t["menu"], [t["module_opt"], t["module_bbs"]])
@@ -548,16 +578,11 @@ elif module == t["module_bbs"]:
     st.title(f"📝 {t['bbs_title']}")
     st.write(t["bbs_desc"])
 
-    st.header("၁။ Data ထည့်သွင်းရန်")
+    st.header(t["bbs_input_header"])
 
-    unit_bbs = st.selectbox("ယူနစ် (Unit) ရွေးချယ်ရန်", ["m", "ft", "mm", "in"], key="unit_bbs")
+    unit_bbs = st.selectbox(t["bbs_unit"], ["m", "ft", "mm", "in"], key="unit_bbs")
 
-    st.markdown(f"""
-    **💡 Shape (ပုံစံ) အလိုက် အနားများ ထည့်သွင်းနည်း -**
-    * **(အရေးကြီး) - A, B, C, D, E အားလုံးကို အပြင်အစွန်းမှ အပြင်အစွန်းသို့ (Outer-to-Outer dimension) ဖြင့် ထည့်သွင်းပေးပါ။**
-    * ပုံကြမ်းပေါ်ရှိ အနီရောင်စာသား (A, B, C...) လေးများအတိုင်း ဇယားထဲတွင် ယှဉ်တွဲထည့်သွင်းပေးပါ။
-    * **Standard Hook:** လိုအပ်ပါက Hook သို့မဟုတ် Lap Length စုစုပေါင်းကို **{unit_bbs}** ယူနစ်ဖြင့် တိုက်ရိုက် ဂဏန်းရိုက်ထည့်ပါ။ (ဒသမနောက် ၄ လုံးအထိ ရိုက်ထည့်နိုင်ပါသည်)
-    """)
+    st.markdown(t["bbs_help"].format(unit=unit_bbs))
 
     if 'bbs_unit_prev' not in st.session_state or st.session_state['bbs_unit_prev'] != unit_bbs or 'bbs_df' not in st.session_state:
         st.session_state['bbs_df'] = pd.DataFrame({
@@ -584,18 +609,18 @@ elif module == t["module_bbs"]:
         column_config={
             "Shape": st.column_config.SelectboxColumn(
                 "Shape",
-                help="သံချောင်းပုံစံရွေးချယ်ရန်",
+                help=t["bbs_shape_help"],
                 options=list(SHAPE_IMAGES.keys()),
                 required=True
             ),
             "Sketch": st.column_config.ImageColumn(
-                "ပုံကြမ်း (Sketch)"
+                t["bbs_sketch"]
             ),
             "Bar Size (mm)": st.column_config.NumberColumn(
                 "Bar Size (mm)", min_value=0, step=1, format="%d"
             ),
             f"Standard Hook ({unit_bbs})": st.column_config.NumberColumn(
-                f"Standard Hook ({unit_bbs})", help="Hook သို့မဟုတ် Lap Length စုစုပေါင်းအရှည်ကို ရိုက်ထည့်ပါ", min_value=0.0, step=0.0001, format="%.4f"
+                f"Standard Hook ({unit_bbs})", help=t["bbs_hook_help"], min_value=0.0, step=0.0001, format="%.4f"
             )
         }
     )
@@ -612,10 +637,10 @@ elif module == t["module_bbs"]:
         st.session_state['bbs_df'] = edited_bbs
         st.rerun()
 
-    bbs_calc_btn = st.button("📊 BBS တွက်ချက်မည် (Calculate)", type="primary")
+    bbs_calc_btn = st.button(t["bbs_calc_btn"], type="primary")
 
     if bbs_calc_btn:
-        with st.spinner("တွက်ချက်နေပါသည်..."):
+        with st.spinner(t["bbs_spin"]):
             bbs_result_df = calculate_bbs(edited_bbs, unit_bbs)
             st.session_state['bbs_result'] = bbs_result_df
             st.session_state['bbs_calculated'] = True
@@ -623,7 +648,7 @@ elif module == t["module_bbs"]:
             st.session_state['bbs_df'] = edited_bbs
 
     if st.session_state.get('bbs_calculated', False):
-        st.header("၂။ BBS ရလဒ်များ")
+        st.header(t["bbs_res_header"])
         res_df = st.session_state['bbs_result']
         curr_unit = st.session_state['bbs_unit']
 
@@ -632,7 +657,7 @@ elif module == t["module_bbs"]:
                 res_df,
                 column_config={
                     "Sketch": st.column_config.ImageColumn(
-                        "ပုံကြမ်း (Sketch)"
+                        t["bbs_sketch"]
                     )
                 },
                 hide_index=True,
@@ -641,10 +666,10 @@ elif module == t["module_bbs"]:
 
             total_kg = res_df["Total Wt (kg)"].sum()
             total_ton = round(total_kg / 1000, 3)
-            st.success(f"⚖️ စုစုပေါင်း အလေးချိန် (Total Weight) = **{round(total_kg, 2)} kg** ({total_ton} Ton)")
+            st.success(f"{t['bbs_total_1']}**{round(total_kg, 2)} kg** ({total_ton} Ton)")
 
             st.divider()
-            st.subheader("📄 BBS Report ဆွဲယူရန်")
+            st.subheader(t["bbs_dl_header"])
             bbs_pdf_bytes = generate_bbs_pdf(res_df, curr_unit)
             st.download_button(
                 label="📥 Download BBS PDF Report",
@@ -654,4 +679,4 @@ elif module == t["module_bbs"]:
                 type="primary"
             )
         else:
-            st.warning("တွက်ချက်ရန်အတွက် Bar Size နှင့် အတိုင်းအတာ (A, B သို့မဟုတ် C) များကို ထည့်သွင်းပေးပါ။")
+            st.warning(t["bbs_warn"])
