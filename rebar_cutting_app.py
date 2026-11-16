@@ -385,9 +385,11 @@ if lang == "မြန်မာ":
         "bbs_dl_header": "📄 BBS Report ဆွဲယူရန်",
         "bbs_warn": "တွက်ချက်ရန်အတွက် Bar Size နှင့် အတိုင်းအတာ (A, B သို့မဟုတ် C) များကို ထည့်သွင်းပေးပါ။",
         "bbs_add_row": "➕ အမျိုးအစား ထည့်ရန်",
-        "bbs_del_pick": "ဖျက်မည့်အတန်း ရွေးပါ",
+        "bbs_row_pick": "အတန်း ရွေးပါ",
+        "bbs_ins_above": "⬆️ အပေါ်မှာ ထည့်ရန်",
+        "bbs_ins_below": "⬇️ အောက်မှာ ထည့်ရန်",
         "bbs_del_row": "🗑️ ဖျက်ရန်",
-        "bbs_del_hint": "အမျိုးအစား အသစ်ထည့်ချင်ရင် ထည့်ရန် နှိပ်ပါ။ ဖျက်ချင်ရင် အတန်းကို ရွေးပြီး ဖျက်ရန် နှိပ်ပါ။"
+        "bbs_del_hint": "လိုချင်တဲ့နေရာမှာ အတန်းထည့်ချင်ရင် အတန်းကို အရင်ရွေးပြီး အပေါ်/အောက် ထည့်ရန် နှိပ်ပါ။ ဖျက်ချင်ရင် အတန်းရွေးပြီး ဖျက်ရန် နှိပ်ပါ။"
     }
 else:
     t = {
@@ -437,9 +439,11 @@ else:
         "bbs_dl_header": "📄 Download BBS Report",
         "bbs_warn": "Please enter the Bar Size and dimensions (A, B or C) to calculate.",
         "bbs_add_row": "➕ Add Row",
-        "bbs_del_pick": "Select row to delete",
+        "bbs_row_pick": "Select row",
+        "bbs_ins_above": "⬆️ Insert Above",
+        "bbs_ins_below": "⬇️ Insert Below",
         "bbs_del_row": "🗑️ Delete Row",
-        "bbs_del_hint": "Tap Add to insert a new type. To delete, pick the row and tap Delete."
+        "bbs_del_hint": "Pick a row, then tap Insert Above / Insert Below to add a row there, or Delete to remove it."
     }
 
 module = st.sidebar.radio(t["menu"], [t["module_opt"], t["module_bbs"]])
@@ -597,7 +601,6 @@ elif module == t["module_bbs"]:
         st.session_state['bbs_df'] = pd.DataFrame({
             "Bar Mark": ["B1", "L1", "U1", "S1", "C1", "DC1", "BU1"],
             "Shape": ["Straight", "L-Shape", "U-Shape", "Stirrup (Rect)", "Crank Bar", "Double Crank", "Bent Up/Down"],
-            "Sketch": [SHAPE_IMAGES[s] for s in ["Straight", "L-Shape", "U-Shape", "Stirrup (Rect)", "Crank Bar", "Double Crank", "Bent Up/Down"]],
             "Bar Size (mm)": [0]*7,
             f"A ({unit_bbs})": [0.0]*7,
             f"B ({unit_bbs})": [0.0]*7,
@@ -609,8 +612,14 @@ elif module == t["module_bbs"]:
             "Bars per Member": [0]*7
         })
 
+    # Sketch is derived from Shape at display time only (not stored),
+    # so typing in the table never triggers an extra rerun.
+    base_bbs = st.session_state['bbs_df'].drop(columns=["Sketch"], errors="ignore")
+    display_bbs = base_bbs.copy()
+    display_bbs.insert(2, "Sketch", [SHAPE_IMAGES.get(str(s), "") for s in display_bbs["Shape"]])
+
     edited_bbs = st.data_editor(
-        st.session_state['bbs_df'],
+        display_bbs,
         num_rows="dynamic",
         use_container_width=True,
         column_order=["Bar Mark", "Shape", "Sketch", "Bar Size (mm)", f"A ({unit_bbs})", f"B ({unit_bbs})", f"C ({unit_bbs})", f"D ({unit_bbs})", f"E ({unit_bbs})", f"Standard Hook ({unit_bbs})", "No. of Members", "Bars per Member"],
@@ -633,63 +642,63 @@ elif module == t["module_bbs"]:
         }
     )
 
-    needs_rerun = False
-    for idx in edited_bbs.index:
-        shape = str(edited_bbs.loc[idx, "Shape"])
-        correct_sketch = SHAPE_IMAGES.get(shape, "")
-        if str(edited_bbs.loc[idx, "Sketch"]) != correct_sketch:
-            edited_bbs.loc[idx, "Sketch"] = correct_sketch
-            needs_rerun = True
+    # Save back without the derived Sketch column, so edits are kept
+    st.session_state['bbs_df'] = edited_bbs.drop(columns=["Sketch"], errors="ignore")
 
-    if needs_rerun:
-        st.session_state['bbs_df'] = edited_bbs
-        st.rerun()
+    def blank_bbs_row():
+        return {
+            "Bar Mark": "",
+            "Shape": "Straight",
+            "Bar Size (mm)": 0,
+            f"A ({unit_bbs})": 0.0,
+            f"B ({unit_bbs})": 0.0,
+            f"C ({unit_bbs})": 0.0,
+            f"D ({unit_bbs})": 0.0,
+            f"E ({unit_bbs})": 0.0,
+            f"Standard Hook ({unit_bbs})": 0.0,
+            "No. of Members": 0,
+            "Bars per Member": 0
+        }
 
-    # Keep the latest table edits, so Add/Delete keeps them
-    st.session_state['bbs_df'] = edited_bbs
-
-    # Add / Delete rows
-    add_col, del_col = st.columns([1, 2])
-    with add_col:
+    # Insert / Delete at a chosen position (Excel-like)
+    df_now = st.session_state['bbs_df']
+    if len(df_now) == 0:
         if st.button(t["bbs_add_row"], type="secondary"):
-            new_row = {
-                "Bar Mark": "",
-                "Shape": "Straight",
-                "Sketch": SHAPE_IMAGES["Straight"],
-                "Bar Size (mm)": 0,
-                f"A ({unit_bbs})": 0.0,
-                f"B ({unit_bbs})": 0.0,
-                f"C ({unit_bbs})": 0.0,
-                f"D ({unit_bbs})": 0.0,
-                f"E ({unit_bbs})": 0.0,
-                f"Standard Hook ({unit_bbs})": 0.0,
-                "No. of Members": 0,
-                "Bars per Member": 0
-            }
-            st.session_state['bbs_df'] = pd.concat(
-                [st.session_state['bbs_df'], pd.DataFrame([new_row])], ignore_index=True)
+            st.session_state['bbs_df'] = pd.DataFrame([blank_bbs_row()])
             st.rerun()
-    with del_col:
-        df_now = st.session_state['bbs_df']
-        del_options = [f"{i + 1}. {row['Bar Mark'] or '—'} ({row['Shape']})" for i, row in df_now.iterrows()]
-        del_idx = st.selectbox(
-            t["bbs_del_pick"], options=list(range(len(del_options))),
-            format_func=lambda i: del_options[i])
-        if st.button(t["bbs_del_row"], type="secondary"):
-            st.session_state['bbs_df'] = df_now.drop(
-                index=del_idx).reset_index(drop=True)
-            st.rerun()
+    else:
+        row_options = [f"{i + 1}. {row['Bar Mark'] or '—'} ({row['Shape']})" for i, row in df_now.iterrows()]
+        pick_col, btn_col = st.columns([1.2, 2])
+        with pick_col:
+            pick_idx = st.selectbox(
+                t["bbs_row_pick"], options=list(range(len(row_options))),
+                format_func=lambda i: row_options[i])
+        with btn_col:
+            ins_above_col, ins_below_col, del_col = st.columns(3)
+            with ins_above_col:
+                if st.button(t["bbs_ins_above"], type="secondary"):
+                    parts = [df_now.iloc[:pick_idx], pd.DataFrame([blank_bbs_row()]), df_now.iloc[pick_idx:]]
+                    st.session_state['bbs_df'] = pd.concat(parts, ignore_index=True)
+                    st.rerun()
+            with ins_below_col:
+                if st.button(t["bbs_ins_below"], type="secondary"):
+                    parts = [df_now.iloc[:pick_idx + 1], pd.DataFrame([blank_bbs_row()]), df_now.iloc[pick_idx + 1:]]
+                    st.session_state['bbs_df'] = pd.concat(parts, ignore_index=True)
+                    st.rerun()
+            with del_col:
+                if st.button(t["bbs_del_row"], type="secondary"):
+                    st.session_state['bbs_df'] = df_now.drop(index=pick_idx).reset_index(drop=True)
+                    st.rerun()
     st.caption(t["bbs_del_hint"])
 
     bbs_calc_btn = st.button(t["bbs_calc_btn"], type="primary")
 
     if bbs_calc_btn:
         with st.spinner(t["bbs_spin"]):
-            bbs_result_df = calculate_bbs(edited_bbs, unit_bbs)
+            bbs_result_df = calculate_bbs(st.session_state['bbs_df'], unit_bbs)
             st.session_state['bbs_result'] = bbs_result_df
             st.session_state['bbs_calculated'] = True
             st.session_state['bbs_unit'] = unit_bbs
-            st.session_state['bbs_df'] = edited_bbs
 
     if st.session_state.get('bbs_calculated', False):
         st.header(t["bbs_res_header"])
